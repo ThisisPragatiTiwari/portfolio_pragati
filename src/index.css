@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,wght@1,500;1,600&display=swap');
 @import "tailwindcss";
+/* author - pragati tiwari */
 
 /* Enable class-based dark mode (Tailwind v4 default is media-query based) */
 @custom-variant dark (&:where(.dark, .dark *));
