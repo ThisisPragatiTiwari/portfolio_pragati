@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test 'api/*.test.js'"
   },
   "dependencies": {
     "bootstrap-icons": "^1.13.1",
@@ -15,7 +16,8 @@
     "gsap": "^3.15.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-router-dom": "^7.18.4"
+    "react-router-dom": "^7.18.4",
+    "resend": "^6.32.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

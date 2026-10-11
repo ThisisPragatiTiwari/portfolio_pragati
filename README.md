@@ -9,6 +9,36 @@ npm install
 npm run dev
 ```
 
+## Contact form (Vercel serverless function)
+
+The form posts to `api/contact.js`, a Node.js serverless function that
+validates input, checks a honeypot + Cloudflare Turnstile, rate-limits per
+IP, and emails you via [Resend](https://resend.com).
+
+**Setup**
+
+1. Create a Resend account → API Keys. Copy `.env.example` to `.env` and fill
+   in `RESEND_API_KEY`, `TO_EMAIL` and `FROM_EMAIL`. Until you verify a
+   domain on Resend, use `Portfolio <onboarding@resend.dev>` as the sender
+   and your Resend signup email as `TO_EMAIL`.
+2. (Recommended) Create a free Turnstile widget at dash.cloudflare.com →
+   Turnstile. Put the secret in `TURNSTILE_SECRET_KEY` and the site key in
+   `VITE_TURNSTILE_SITE_KEY`. Leave both empty to skip the check locally.
+
+**Run locally with the API** — plain `npm run dev` does *not* serve `/api`:
+
+```bash
+npm i -g vercel
+vercel dev
+```
+
+**Deploy** — import the repo in Vercel, add the same variables under
+Project → Settings → Environment Variables, then redeploy (env changes
+only apply to new deployments; `VITE_*` values are baked in at build time).
+
+**Tests** — `npm test` runs the API handler tests (validation, honeypot,
+rate limit, Turnstile, Resend failure) with email sending stubbed out.
+
 ## Build for production
 
 ```bash
