@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+/* Enable class-based dark mode (Tailwind v4 default is media-query based) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Open Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Light theme */
+  --color-paper: #fff8fa;
+  --color-paper-dim: #fbeaf1;
+  --color-ink: #241823;
+  --color-ink-soft: #6e5768;
+
+  /* Primary = pink/rose, Secondary = soft blue-violet */
+  --color-pink: #e14f86;
+  --color-pink-bright: #ff7eb0;
+  --color-violet: #7b87e0;
+  --color-violet-bright: #9aa4ff;
+
+  /* Dark theme */
+  --color-night: #1a1420;
+  --color-night-raised: #251b2c;
+  --color-mist: #f5eef2;
+  --color-mist-soft: #bda8b9;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  transition: background-color 0.35s ease, color 0.35s ease;
+  overflow-x: hidden;
+}
+
+.dark body {
+  background-color: var(--color-night);
+  color: var(--color-mist);
+}
+
+::selection {
+  background: var(--color-pink);
+  color: var(--color-paper);
+}
+
+/* Respect reduced-motion preference globally */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Visible keyboard focus */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--color-pink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
