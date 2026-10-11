@@ -18,6 +18,7 @@ export default function Contact() {
   const [errors, setErrors] = useState({})
   // status: 'idle' | 'sending' | 'success' | 'error'
   const [status, setStatus] = useState('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const turnstileRef = useRef(null)
   const widgetId = useRef(null)
@@ -75,6 +76,7 @@ export default function Contact() {
     if (Object.keys(validationErrors).length > 0) return
 
     setStatus('sending')
+    setErrorMessage('')
 
     try {
       const res = await fetch('/api/contact', {
@@ -90,9 +92,19 @@ export default function Contact() {
       })
 
       if (!res.ok) {
+        // The API returns { error, fields? } — surface its message (rate
+        // limit, bot check, validation) instead of a generic failure.
+        const data = await res.json().catch(() => ({}))
+        if (data.fields) setErrors(data.fields)
+        setErrorMessage(
+          res.status === 429
+            ? 'Too many messages from this connection — please try again later.'
+            : data.error || 'Something went wrong — please try again.'
+        )
         throw new Error('Request failed')
       }
 
+      setErrorMessage('')
       setStatus('success')
       setForm(EMPTY_FORM)
       setHoneypot('')
@@ -101,6 +113,8 @@ export default function Contact() {
         window.turnstile.reset(widgetId.current)
       }
     } catch {
+      // Network failure (no response at all) never set a message above.
+      setErrorMessage((m) => m || 'Couldn’t reach the server — check your connection and try again.')
       setStatus('error')
       if (window.turnstile && widgetId.current !== null) {
         window.turnstile.reset(widgetId.current)
@@ -154,15 +168,15 @@ export default function Contact() {
                 href={`mailto:${profile.email}`}
                 className="inline-flex items-center gap-3 hover:underline"
               >
-                <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-paper/20 dark:bg-night/15">
-                  <i className="bi bi-envelope" />
+                <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-paper text-pink dark:bg-night dark:text-pink-bright">
+                  <i className="bi bi-envelope-fill" />
                 </span>
                 {profile.email}
               </a>
             </li>
             <li className="inline-flex items-center gap-3">
-              <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-paper/20 dark:bg-night/15">
-                <i className="bi bi-geo-alt" />
+              <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-paper text-pink dark:bg-night dark:text-pink-bright">
+                <i className="bi bi-geo-alt-fill" />
               </span>
               {profile.location}
             </li>
@@ -300,24 +314,27 @@ export default function Contact() {
           {status === 'sending' ? 'Sending...' : 'Send message'}
         </button>
 
-        {status === 'success' && (
-          <motion.p
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center text-sm text-pink dark:text-pink-bright"
-          >
-            Thanks for reaching out — your message has been sent. I'll get back to you soon.
-          </motion.p>
-        )}
-        {status === 'error' && (
-          <motion.p
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center text-sm text-red-500"
-          >
-            Something went wrong — please try again.
-          </motion.p>
-        )}
+        {/* aria-live so screen readers announce the result */}
+        <div aria-live="polite">
+          {status === 'success' && (
+            <motion.p
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center text-sm text-pink dark:text-pink-bright"
+            >
+              Thanks for reaching out — your message has been sent. I'll get back to you soon.
+            </motion.p>
+          )}
+          {status === 'error' && (
+            <motion.p
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center text-sm text-red-500"
+            >
+              {errorMessage || 'Something went wrong — please try again.'}
+            </motion.p>
+          )}
+        </div>
       </form>
       </motion.div>
     </section>
